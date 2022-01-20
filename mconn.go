@@ -8,15 +8,15 @@ import (
 )
 
 type multiConn struct {
-	sync.Mutex
+	sync.RWMutex
 	cn     net.Conn
 	mr     io.Reader
 	closed bool
 }
 
 func (m *multiConn) Read(p []byte) (int, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	if m.closed {
 		return 0, io.ErrClosedPipe
 	}
@@ -24,8 +24,8 @@ func (m *multiConn) Read(p []byte) (int, error) {
 }
 
 func (m *multiConn) Write(p []byte) (int, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	if m.closed {
 		return 0, io.ErrClosedPipe
 	}
@@ -43,8 +43,8 @@ func (m *multiConn) Close() error {
 }
 
 func (m *multiConn) LocalAddr() net.Addr {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	if m.closed {
 		return nil
 	}
@@ -52,8 +52,8 @@ func (m *multiConn) LocalAddr() net.Addr {
 }
 
 func (m *multiConn) RemoteAddr() net.Addr {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	if m.closed {
 		return nil
 	}
@@ -61,8 +61,8 @@ func (m *multiConn) RemoteAddr() net.Addr {
 }
 
 func (m *multiConn) SetDeadline(t time.Time) error {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	if m.closed {
 		return io.ErrClosedPipe
 	}
@@ -70,8 +70,8 @@ func (m *multiConn) SetDeadline(t time.Time) error {
 }
 
 func (m *multiConn) SetReadDeadline(t time.Time) error {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	if m.closed {
 		return io.ErrClosedPipe
 	}
@@ -79,8 +79,8 @@ func (m *multiConn) SetReadDeadline(t time.Time) error {
 }
 
 func (m *multiConn) SetWriteDeadline(t time.Time) error {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	if m.closed {
 		return io.ErrClosedPipe
 	}

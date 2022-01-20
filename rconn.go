@@ -9,7 +9,7 @@ import (
 )
 
 type roConn struct {
-	sync.Mutex
+	sync.RWMutex
 	cn     net.Conn
 	buf    []byte
 	closed bool
@@ -20,8 +20,8 @@ func newRoConn(cn net.Conn) *roConn {
 }
 
 func (c *roConn) Read(p []byte) (int, error) {
-	c.Lock()
-	defer c.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 	if c.closed {
 		return 0, io.ErrClosedPipe
 	}
@@ -33,6 +33,8 @@ func (c *roConn) Read(p []byte) (int, error) {
 }
 
 func (c *roConn) Write([]byte) (int, error) {
+	c.RLock()
+	defer c.RUnlock()
 	return 0, io.ErrClosedPipe
 }
 
@@ -47,8 +49,8 @@ func (c *roConn) Close() error {
 }
 
 func (c *roConn) LocalAddr() net.Addr {
-	c.Lock()
-	defer c.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 	if c.closed {
 		return nil
 	}
@@ -56,8 +58,8 @@ func (c *roConn) LocalAddr() net.Addr {
 }
 
 func (c *roConn) RemoteAddr() net.Addr {
-	c.Lock()
-	defer c.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 	if c.closed {
 		return nil
 	}
@@ -65,8 +67,8 @@ func (c *roConn) RemoteAddr() net.Addr {
 }
 
 func (c *roConn) SetDeadline(t time.Time) error {
-	c.Lock()
-	defer c.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 	if c.closed {
 		return io.ErrClosedPipe
 	}
@@ -74,8 +76,8 @@ func (c *roConn) SetDeadline(t time.Time) error {
 }
 
 func (c *roConn) SetReadDeadline(t time.Time) error {
-	c.Lock()
-	defer c.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 	if c.closed {
 		return io.ErrClosedPipe
 	}
@@ -83,8 +85,8 @@ func (c *roConn) SetReadDeadline(t time.Time) error {
 }
 
 func (c *roConn) SetWriteDeadline(t time.Time) error {
-	c.Lock()
-	defer c.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 	if c.closed {
 		return io.ErrClosedPipe
 	}
