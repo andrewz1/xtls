@@ -11,12 +11,13 @@ import (
 	"github.com/andrewz1/xnet"
 )
 
-func proxySNI(cn net.Conn) (net.Conn, error) {
-	ccn, sni, err := PeekSNI(cn)
+func connMain(t *testing.T, cn net.Conn) {
+	tc, err := ReadHello(cn)
 	if err != nil {
-		return cn, err
+		cn.Close()
+		t.Fatal(err)
 	}
-	return ccn, ProxySNI(ccn, sni, 10*time.Second, nil)
+	t.Log(tc.ProxySNI(time.Second*10, nil))
 }
 
 func TestProxySNI(t *testing.T) {
@@ -24,17 +25,12 @@ func TestProxySNI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer ln.Close()
 	for {
 		cn, err := ln.Accept()
 		if err != nil {
 			t.Fatal(err)
 		}
-		go func() {
-			ccn, err := proxySNI(cn)
-			t.Log(err)
-			ccn.Close()
-		}()
+		go connMain(t, cn)
 	}
 }
 
