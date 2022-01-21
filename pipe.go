@@ -29,7 +29,7 @@ func (p *pipeOne) wrTmo() {
 }
 
 func (p *pipeOne) read(b []byte) (int, error) {
-	if !p.ac.IsAuth(false) {
+	if !p.ac.Auth() {
 		return 0, fmt.Errorf("session timeout")
 	}
 	p.rdTmo()
@@ -37,7 +37,7 @@ func (p *pipeOne) read(b []byte) (int, error) {
 }
 
 func (p *pipeOne) write(b []byte) error {
-	if !p.ac.IsAuth(false) {
+	if !p.ac.Auth() {
 		return fmt.Errorf("session timeout")
 	}
 	p.wrTmo()

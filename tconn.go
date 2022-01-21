@@ -36,7 +36,7 @@ var (
 )
 
 type AuthChecker interface {
-	IsAuth(finOnly bool) bool
+	Auth() bool
 }
 
 type TConn struct {
