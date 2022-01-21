@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"sync/atomic"
 	"time"
 
 	"github.com/andrewz1/xbuf"
@@ -25,6 +26,12 @@ const (
 )
 
 var (
+	tlsAlert = []byte{
+		0x15,       /* TLS Alert */
+		0x03, 0x01, /* TLS version  */
+		0x00, 0x02, /* Payload length */
+		0x02, 0x28, /* Fatal, handshake failure */
+	}
 	retErr = fmt.Errorf("handshake error")
 )
 
@@ -36,10 +43,18 @@ type TConn struct {
 	net.Conn           // original connection
 	rd       io.Reader // multireader for reread hello message
 	sni      string    // connection SNI
+	closed   uint32    // closed flag
 }
 
 func (c *TConn) Read(p []byte) (int, error) {
 	return c.rd.Read(p)
+}
+
+func (c *TConn) Close() error {
+	if atomic.CompareAndSwapUint32(&c.closed, 0, 1) {
+		c.Conn.Write(tlsAlert)
+	}
+	return c.Conn.Close()
 }
 
 func (c *TConn) GetSNI() string {
