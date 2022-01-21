@@ -28,6 +28,10 @@ var (
 	retErr = fmt.Errorf("handshake error")
 )
 
+type AuthChecker interface {
+	IsAuth(finOnly bool) bool
+}
+
 type TConn struct {
 	net.Conn           // original connection
 	rd       io.Reader // multireader for reread hello message
@@ -71,14 +75,13 @@ func (c *TConn) dialSNI(r *net.Resolver) (net.Conn, error) {
 	return xnet.DialTCPContext(ctx, "tcp", nil, ta)
 }
 
-func (c *TConn) ProxySNI(tmo time.Duration, r *net.Resolver) error {
+func (c *TConn) ProxySNI(tmo time.Duration, r *net.Resolver, ac AuthChecker) error {
 	cc, err := c.dialSNI(r)
 	if err != nil {
 		c.Close()
 		return err
 	}
-	return Pipe(c, cc, tmo)
-
+	return Pipe(c, cc, tmo, ac)
 }
 
 type hConn struct { // hello read helper
