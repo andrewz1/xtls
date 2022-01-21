@@ -92,8 +92,6 @@ func Pipe(inner, outer net.Conn, tmo time.Duration, ac AuthChecker) error {
 	go p2.pipe()
 	err := <-ec
 	wg.Wait()
-	inner.Close()
-	outer.Close()
 	close(ec)
 	return err
 }

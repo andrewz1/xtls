@@ -93,9 +93,9 @@ func (c *TConn) dialSNI(r *net.Resolver) (net.Conn, error) {
 func (c *TConn) ProxySNI(tmo time.Duration, r *net.Resolver, ac AuthChecker) error {
 	cc, err := c.dialSNI(r)
 	if err != nil {
-		c.Close()
 		return err
 	}
+	defer c.Close()
 	return Pipe(c, cc, tmo, ac)
 }
 
