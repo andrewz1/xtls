@@ -50,6 +50,10 @@ func (c *TConn) Read(p []byte) (int, error) {
 	return c.rd.Read(p)
 }
 
+func (c *TConn) NoAlert() {
+	atomic.StoreUint32(&c.closed, 1)
+}
+
 func (c *TConn) Close() error {
 	if atomic.CompareAndSwapUint32(&c.closed, 0, 1) {
 		c.Conn.Write(tlsAlert)
