@@ -1,8 +1,4 @@
-github.com/andrewz1/xbuf v0.0.0-20211228201754-a26567d9ab90 h1:VilC3HKAliT52qJCvBaineUfrjsuHq+BTByuhxYFlc8=
-github.com/andrewz1/xbuf v0.0.0-20211228201754-a26567d9ab90/go.mod h1:8po7+wIkQL9fxf+/miJAaZurV5XMww/iBGum/6nGBw8=
-github.com/andrewz1/xbuf v0.0.0-20220120144401-f2d819fb3656 h1:/3qr8LRJosiE1M+cy2CIOgcKlnXvzezOej4yTKynmVg=
-github.com/andrewz1/xbuf v0.0.0-20220120144401-f2d819fb3656/go.mod h1:8po7+wIkQL9fxf+/miJAaZurV5XMww/iBGum/6nGBw8=
 github.com/andrewz1/xbuf v0.0.0-20220120150912-09273b98b92d h1:nEGnTQ0+ZrEYdkOlGacKy/wYUa+FMKAFFizc0G7967A=
 github.com/andrewz1/xbuf v0.0.0-20220120150912-09273b98b92d/go.mod h1:8po7+wIkQL9fxf+/miJAaZurV5XMww/iBGum/6nGBw8=
-github.com/andrewz1/xnet v0.0.0-20211229125418-7d11a926a131 h1:nRA745FG0CF7Ut7eg6wX3G46WFGZKxragURk2QPVCow=
-github.com/andrewz1/xnet v0.0.0-20211229125418-7d11a926a131/go.mod h1:YQY/vH7cn5VYu3DjPzLbd82Ssk2NMUFmA9/thfG80ws=
+github.com/andrewz1/xnet v0.0.0-20220412103726-9d74a34895df h1:JBQOU0GYma1o8QyvOGYGPns1hVPMqEi4qThcnNVbc40=
+github.com/andrewz1/xnet v0.0.0-20220412103726-9d74a34895df/go.mod h1:YQY/vH7cn5VYu3DjPzLbd82Ssk2NMUFmA9/thfG80ws=

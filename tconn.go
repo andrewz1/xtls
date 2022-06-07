@@ -3,6 +3,8 @@ package xtls
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"net"
@@ -32,6 +34,12 @@ var (
 		0x00, 0x02, /* Payload length */
 		0x02, 0x28, /* Fatal, handshake failure */
 	}
+	tlsClose = []byte{
+		21,   /* TLS Alert */
+		0, 0, /* TLS version - insert! */
+		0, 2, /* Payload length */
+		2, 0, /* Fatal, close notify */
+	}
 	retErr = fmt.Errorf("handshake error")
 )
 
@@ -44,6 +52,8 @@ type TConn struct {
 	rd       io.Reader // multireader for reread hello message
 	sni      string    // connection SNI
 	closed   uint32    // closed flag
+	ver      uint16    // tls version
+	ver2     uint16    // tls version 2
 }
 
 func (c *TConn) Read(p []byte) (int, error) {
@@ -56,7 +66,7 @@ func (c *TConn) NoAlert() {
 
 func (c *TConn) Close() error {
 	if atomic.CompareAndSwapUint32(&c.closed, 0, 1) {
-		c.Conn.Write(tlsAlert)
+		c.Conn.Write(getAlert(c.ver))
 	}
 	return c.Conn.Close()
 }
@@ -108,6 +118,8 @@ type hConn struct { // hello read helper
 	rb   *xbuf.RB // data parse buffer
 	buf  []byte   // data read buffer
 	mLen int      // hello message len
+	ver  uint16   // tls version
+	ver2 uint16   // tls version2
 }
 
 func (c *hConn) readTmo(n int) (int, error) { // read with timeout
@@ -140,7 +152,8 @@ func (c *hConn) skipToExt() error {
 	if ln := int(c.rb.MustGetU24()); ln != c.rb.Left() { // second msg len
 		return retErr
 	}
-	if c.rb.MustGetU16() < 0x300 { // second tls version
+	c.ver2 = c.rb.MustGetU16()
+	if c.ver2 < tls.VersionTLS10 || c.ver2 > tls.VersionTLS13 { // second tls version
 		return retErr
 	}
 	if !c.rb.Skip(randLen) { // rand bytes
@@ -222,6 +235,14 @@ func findSNIHost(sniList *xbuf.RB) *xbuf.RB {
 	return nil
 }
 
+func getAlert(ver uint16) []byte {
+	vv := make([]byte, 2)
+	binary.BigEndian.PutUint16(vv, ver)
+	ret := append([]byte{}, tlsClose...)
+	copy(ret[1:], vv)
+	return ret
+}
+
 func getHConn(cn net.Conn) (cc *hConn, err error) {
 	c := &hConn{
 		cn:  cn,
@@ -254,11 +275,17 @@ func getHConn(cn net.Conn) (cc *hConn, err error) {
 		err = retErr
 		return
 	}
+	c.ver = c.rb.MustGetU16()
 	// tls version
-	if c.rb.MustGetU16() < 0x300 { // sslv3
+	if c.ver < tls.VersionTLS10 || c.ver > tls.VersionTLS13 { // tls1.0 - tls1.3
 		err = retErr
 		return
 	}
+	defer func() {
+		if err != nil {
+			cn.Write(getAlert(c.ver))
+		}
+	}()
 	c.mLen = int(c.rb.MustGetU16()) + hdrLen // full msg size
 	var need int
 	for i := 0; i < rdTry; i++ {
@@ -289,7 +316,12 @@ func ReadHello(cn net.Conn) (*TConn, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer putHConn(c)
+	defer func() {
+		if err != nil {
+			cn.Write(getAlert(c.ver))
+		}
+		putHConn(c)
+	}()
 	if err = c.skipToExt(); err != nil {
 		return nil, err
 	}
@@ -302,5 +334,7 @@ func ReadHello(cn net.Conn) (*TConn, error) {
 		Conn: cn,
 		rd:   io.MultiReader(rd, cn),
 		sni:  sni,
+		ver:  c.ver,
+		ver2: c.ver2,
 	}, nil
 }
