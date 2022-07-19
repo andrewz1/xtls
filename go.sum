@@ -1,4 +1,4 @@
-github.com/andrewz1/xbuf v0.0.0-20220120150912-09273b98b92d h1:nEGnTQ0+ZrEYdkOlGacKy/wYUa+FMKAFFizc0G7967A=
-github.com/andrewz1/xbuf v0.0.0-20220120150912-09273b98b92d/go.mod h1:8po7+wIkQL9fxf+/miJAaZurV5XMww/iBGum/6nGBw8=
-github.com/andrewz1/xnet v0.0.0-20220412103726-9d74a34895df h1:JBQOU0GYma1o8QyvOGYGPns1hVPMqEi4qThcnNVbc40=
-github.com/andrewz1/xnet v0.0.0-20220412103726-9d74a34895df/go.mod h1:YQY/vH7cn5VYu3DjPzLbd82Ssk2NMUFmA9/thfG80ws=
+github.com/andrewz1/xbuf v0.0.1 h1:mHEvuooIotKoik1TE1yjpy0fVO633h8woWiDQ+aiG/E=
+github.com/andrewz1/xbuf v0.0.1/go.mod h1:8po7+wIkQL9fxf+/miJAaZurV5XMww/iBGum/6nGBw8=
+github.com/andrewz1/xnet v0.0.1 h1:qX0inm7iS3KHFiVUcez1KgeOlOtge2hmTt6yMFPYim0=
+github.com/andrewz1/xnet v0.0.1/go.mod h1:YQY/vH7cn5VYu3DjPzLbd82Ssk2NMUFmA9/thfG80ws=

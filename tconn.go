@@ -36,9 +36,9 @@ var (
 	}
 	tlsClose = []byte{
 		21,   /* TLS Alert */
-		0, 0, /* TLS version - insert! */
+		3, 1, /* TLS version - insert! */
 		0, 2, /* Payload length */
-		2, 0, /* Fatal, close notify */
+		1, 0, /* Warn, close notify */
 	}
 	retErr = fmt.Errorf("handshake error")
 )
